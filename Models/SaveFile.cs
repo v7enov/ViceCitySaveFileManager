@@ -1,6 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text;
 using ViceCitySaveFileManager.Annotations;
 
 namespace ViceCitySaveFileManager.Models
@@ -36,7 +38,37 @@ namespace ViceCitySaveFileManager.Models
             }
         }
 
-        public string LastMission => "Mission Name";
+        public string LastMission => ReadLastMission(Location);
+
+        private string ReadLastMission(string path)
+        {
+            var allBytes = File.ReadAllBytes(path);
+            var newBytes = new List<byte>();
+            var counter = 0;
+
+            for (var i = 0; i < allBytes.Length; ++i)
+            {
+                if (i <= 3) continue;
+
+                newBytes.Add(allBytes[i]);
+
+                if (allBytes[i] == 0)
+                {
+                    counter++;
+
+                    if (counter == 2)
+                    {
+                        newBytes.RemoveAt(newBytes.Count - 1);
+                        break;
+                    }
+                }
+                else
+                {
+                    counter = 0;
+                }
+            }
+            return Encoding.Unicode.GetString(newBytes.ToArray());
+        }
 
         public bool FileExists
         {

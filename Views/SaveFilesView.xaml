@@ -33,6 +33,7 @@
                     <StackPanel Margin="5">
                         <TextBlock FontSize="13" Text="{Binding Path=Name}" />
                         <TextBlock FontSize="13" Text="{Binding Path=Description}" />
+                        <TextBlock FontSize="13" Text="{Binding Path=LastMission}" />
                     </StackPanel>
                 </DataTemplate>
                 </ListBox.ItemTemplate>
