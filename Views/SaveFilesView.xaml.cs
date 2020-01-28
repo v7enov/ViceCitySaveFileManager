@@ -12,7 +12,13 @@ namespace ViceCitySaveFileManager.Views
         public SaveFilesView()
         {
             InitializeComponent();
+            Initialize();
             DataContext = new SaveFilesViewModel();
+        }
+
+        private void Initialize()
+        {
+            GlobalConfig.CreateDirectories();
         }
     }
 }

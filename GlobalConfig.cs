@@ -32,5 +32,11 @@ namespace ViceCitySaveFileManager
         {
             return Path.Combine(GetApplicationBasePath() + ReplayFiles);
         }
+
+        public static void CreateDirectories()
+        {
+            if (!Directory.Exists(GetReplayFilesPath())) Directory.CreateDirectory(GetReplayFilesPath());
+            if (!Directory.Exists(GetSaveFilesPath())) Directory.CreateDirectory(GetSaveFilesPath());
+        }
     }
 }

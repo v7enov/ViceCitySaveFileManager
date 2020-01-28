@@ -23,7 +23,6 @@ namespace ViceCitySaveFileManager.ViewModels
 
         public SaveFilesViewModel()
         {
-
             SaveFiles = new ObservableCollection<SaveFile>
             {
                 new SaveFile(1, "asdasd", "asdasdad"),

@@ -54,6 +54,7 @@ namespace ViceCitySaveFileManager.Models
 
         public static string ReadLastMission(string path)
         {
+            if (!File.Exists(path)) return "";
             var allBytes = File.ReadAllBytes(path);
             var newBytes = new List<byte>();
             var counter = 0;
