@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Windows;
 using ViceCitySaveFileManager.Annotations;
 using ViceCitySaveFileManager.Models;
@@ -89,7 +88,7 @@ namespace ViceCitySaveFileManager.ViewModels
                                        UpdateSaveFiles();
                                    }
                                }
-                           }, (obj) => SelectedSaveFile != null && SaveFiles.Count > 0
+                           }, (obj) => SelectedSaveFile != null && SaveFiles.Count > 0 && !SelectedSaveFile.FileExists
                        ));
             }
         }
@@ -111,7 +110,7 @@ namespace ViceCitySaveFileManager.ViewModels
                                    }
                                    catch (Exception e)
                                    {
-                                       MessageBox.Show(e.Message);
+                                       _dialogService.ShowMessage(e.Message);
                                        throw;
                                    }
                                }
@@ -127,10 +126,7 @@ namespace ViceCitySaveFileManager.ViewModels
 
         private void UpdateSaveFiles()
         {
-            foreach (var saveFile in SaveFiles)
-            {
-                saveFile.LastMission = SaveFile.ReadLastMission(saveFile.Location);
-            }
+            foreach (var saveFile in SaveFiles) saveFile.UpdateState();
         }
 
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Permissions;
@@ -46,7 +47,7 @@ namespace ViceCitySaveFileManager.Models
             }
         }
 
-        public string Location { get; set; }
+        public string Location => Path.Combine(GlobalConfig.GetReplayFilesPath(), $"{Id}.b");
 
         public ReplayFile(int id, string name, string description)
         {

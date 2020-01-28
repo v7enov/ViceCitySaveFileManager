@@ -4,10 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="SaveFilesView" Height="450" Width="800" FontSize="12">
+        Title="SaveFilesView" Height="720" Width="1280" FontSize="12">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
@@ -24,6 +28,10 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
@@ -34,6 +42,7 @@
                         <TextBlock FontSize="13" Text="{Binding Path=Name}" />
                         <TextBlock FontSize="13" Text="{Binding Path=Description}" />
                         <TextBlock FontSize="13" Text="{Binding Path=LastMission, Mode=OneWay}" />
+                        <CheckBox FontSize="13" IsChecked="{Binding Path=FileExists, Mode=OneWay}"></CheckBox>
                     </StackPanel>
                 </DataTemplate>
                 </ListBox.ItemTemplate>
