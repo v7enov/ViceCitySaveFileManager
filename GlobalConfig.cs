@@ -25,7 +25,7 @@ namespace ViceCitySaveFileManager
 
         public static string GetVCSaveFilesDirectory()
         {
-            return Path.Combine(UserFolder, "Documents", "Vice City User Files");
+            return Path.Combine(UserFolder, "Documents", "GTA Vice City User Files");
         }
 
         public static string GetReplayFilesPath()

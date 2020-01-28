@@ -16,6 +16,7 @@ namespace ViceCitySaveFileManager.Models
         private string _name;
         private int _id;
         private string _description;
+        private bool _fileExists;
 
         public int Id
         {
@@ -47,13 +48,29 @@ namespace ViceCitySaveFileManager.Models
             }
         }
 
-        public string Location => Path.Combine(GlobalConfig.GetReplayFilesPath(), $"{Id}.b");
+        public string Location => Path.Combine(GlobalConfig.GetReplayFilesPath(), $"{Id}.rep");
 
         public ReplayFile(int id, string name, string description)
         {
             Id = id;
             Name = name;
             Description = description;
+        }
+
+        public bool FileExists {
+            get {
+                _fileExists = File.Exists(Location);
+                return _fileExists;
+            }
+            set {
+                _fileExists = value;
+                OnPropertyChanged(nameof(FileExists));
+            }
+        }
+
+        public void UpdateState()
+        {
+            FileExists = File.Exists(Location);
         }
 
 

@@ -13,13 +13,17 @@ namespace ViceCitySaveFileManager.ViewModels
     public class SaveFilesViewModel : INotifyPropertyChanged
     {
         private SaveFile _selectedSaveFile;
+        private ReplayFile _selectedReplayFile;
         private RelayCommand _addCommand;
         private RelayCommand _removeCommand;
         private RelayCommand _addSaveFile;
+        private RelayCommand _attachReplayFile;
+        private RelayCommand _addReplayRecord;
         private readonly IDialogService _dialogService = new DefaultDialogService();
 
         public ObservableCollection<SaveFile> SaveFiles { get; set; }
         public ObservableCollection<ReplayFile> ReplayFiles { get; set; }
+
 
         public SaveFilesViewModel()
         {
@@ -47,6 +51,14 @@ namespace ViceCitySaveFileManager.ViewModels
             }
         }
 
+        public ReplayFile SelectedReplayFile {
+            get => _selectedReplayFile;
+            set {
+                _selectedReplayFile = value;
+                OnPropertyChanged(nameof(SelectedReplayFile));
+            }
+        }
+
         public bool IsReplayFilesAvailable => ReplayFiles.Count > 0 && SelectedSaveFile != null;
 
         public RelayCommand AddCommand
@@ -56,7 +68,7 @@ namespace ViceCitySaveFileManager.ViewModels
                 return _addCommand ??
                        (_addCommand = new RelayCommand(obj =>
                        {
-                           var saveFile = new SaveFile(GetMaxId() + 1, "New save", "New save file");
+                           var saveFile = new SaveFile(GetMaxId(true) + 1, "New save", "New save file");
                            SaveFiles.Add(saveFile);
                            SelectedSaveFile = saveFile;
                        }));
@@ -84,11 +96,50 @@ namespace ViceCitySaveFileManager.ViewModels
                                    }
                                    finally
                                    {
-                                       UpdateSaveFiles();
+                                       UpdateState();
                                    }
                                }
                            }, (obj) => SelectedSaveFile != null && SaveFiles.Count > 0 && !SelectedSaveFile.FileExists
                        ));
+            }
+        }
+
+        public RelayCommand AttachReplayFile {
+            get {
+                return _attachReplayFile ??
+                       (_attachReplayFile = new RelayCommand(obj =>
+                       {
+                           if (obj is ReplayFile replayFile)
+                           {
+                               if (!_dialogService.OpenFileDialog()) return;
+                               try
+                               {
+                                   File.Copy(_dialogService.FilePath, replayFile.Location);
+                               }
+                               catch (Exception e)
+                               {
+                                   MessageBox.Show(e.Message);
+                                   throw;
+                               }
+                               finally
+                               {
+                                   UpdateState();
+                               }
+                           }
+                       }, (obj) => SelectedReplayFile != null && ReplayFiles.Count > 0 && !SelectedReplayFile.FileExists
+                       ));
+            }
+        }
+
+        public RelayCommand AddReplayRecord {
+            get {
+                return _addReplayRecord ??
+                       (_addReplayRecord = new RelayCommand(obj =>
+                       {
+                           var replayFile = new ReplayFile(GetMaxId(false) + 1, "New replay", "New replay file");
+                           ReplayFiles.Add(replayFile);
+                           SelectedReplayFile = replayFile;
+                       }));
             }
         }
 
@@ -118,14 +169,22 @@ namespace ViceCitySaveFileManager.ViewModels
             }
         }
 
-        private int GetMaxId()
+        private int GetMaxId(bool isSavefiles)
         {
-            return SaveFiles.Select(saveFile => saveFile.Id).Concat(new[] {0}).Max();
+            switch(isSavefiles)
+            {
+                case true:
+                    return SaveFiles.Select(saveFile => saveFile.Id).Concat(new[] { 0 }).Max();
+                case false:
+                    return ReplayFiles.Select(saveFile => saveFile.Id).Concat(new[] { 0 }).Max();
+            }
+            return 0;
         }
 
-        private void UpdateSaveFiles()
+        private void UpdateState()
         {
             foreach (var saveFile in SaveFiles) saveFile.UpdateState();
+            foreach (var replayFile in ReplayFiles) replayFile.UpdateState();
         }
 
 
