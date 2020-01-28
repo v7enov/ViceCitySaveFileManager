@@ -33,7 +33,7 @@
                     <StackPanel Margin="5">
                         <TextBlock FontSize="13" Text="{Binding Path=Name}" />
                         <TextBlock FontSize="13" Text="{Binding Path=Description}" />
-                        <TextBlock FontSize="13" Text="{Binding Path=LastMission}" />
+                        <TextBlock FontSize="13" Text="{Binding Path=LastMission, Mode=OneWay}" />
                     </StackPanel>
                 </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -49,7 +49,7 @@
         <CheckBox Grid.Column="4" Grid.Row="2" DataContext="{Binding SelectedSaveFile}" IsHitTestVisible="False"  IsChecked="{Binding FileExists, Mode=OneWay}" ></CheckBox>
 
 
-        <ComboBox Grid.Row="3" Grid.Column="4" Height="40" Width="130" IsEnabled="{Binding isReplayFilesAvailable}" ItemsSource="{Binding ReplayFiles}" SelectedItem="{Binding SelectedSaveFile.AttachedReplayFile}" DisplayMemberPath="Name">
+        <ComboBox Grid.Row="3" Grid.Column="4" Height="40" Width="130" IsEnabled="{Binding IsReplayFilesAvailable}" ItemsSource="{Binding ReplayFiles}" SelectedItem="{Binding SelectedSaveFile.AttachedReplayFile}" DisplayMemberPath="Name">
         </ComboBox>
     </Grid>
 </Window>

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using ViceCitySaveFileManager.Annotations;
 using ViceCitySaveFileManager.Models;
@@ -16,13 +17,14 @@ namespace ViceCitySaveFileManager.ViewModels
         private RelayCommand _addCommand;
         private RelayCommand _removeCommand;
         private RelayCommand _addSaveFile;
-        private IDialogService dialogService = new DefaultDialogService();
+        private readonly IDialogService _dialogService = new DefaultDialogService();
 
         public ObservableCollection<SaveFile> SaveFiles { get; set; }
         public ObservableCollection<ReplayFile> ReplayFiles { get; set; }
 
         public SaveFilesViewModel()
         {
+
             SaveFiles = new ObservableCollection<SaveFile>
             {
                 new SaveFile(1, "asdasd", "asdasdad"),
@@ -35,21 +37,19 @@ namespace ViceCitySaveFileManager.ViewModels
                 new ReplayFile(2, "asdasd", "asd")
             };
         }
+
         public SaveFile SelectedSaveFile
         {
             get => _selectedSaveFile;
-            set 
+            set
             {
                 _selectedSaveFile = value;
                 OnPropertyChanged(nameof(SelectedSaveFile));
-                OnPropertyChanged(nameof(isReplayFilesAvailable));
+                OnPropertyChanged(nameof(IsReplayFilesAvailable));
             }
         }
 
-        public bool isReplayFilesAvailable
-        {
-            get => ReplayFiles.Count > 0 && SelectedSaveFile != null;
-        }
+        public bool IsReplayFilesAvailable => ReplayFiles.Count > 0 && SelectedSaveFile != null;
 
         public RelayCommand AddCommand
         {
@@ -65,25 +65,31 @@ namespace ViceCitySaveFileManager.ViewModels
             }
         }
 
-        public RelayCommand AddSaveFile {
-            get {
+        public RelayCommand AddSaveFile
+        {
+            get
+            {
                 return _addSaveFile ??
                        (_addSaveFile = new RelayCommand(obj =>
                            {
                                if (obj is SaveFile saveFile)
                                {
-                                   dialogService.OpenFileDialog();
+                                   if (!_dialogService.OpenFileDialog()) return;
                                    try
                                    {
-                                       File.Copy(dialogService.FilePath, saveFile.Location);
+                                       File.Copy(_dialogService.FilePath, saveFile.Location);
                                    }
                                    catch (Exception e)
                                    {
                                        MessageBox.Show(e.Message);
                                        throw;
                                    }
+                                   finally
+                                   {
+                                       UpdateSaveFiles();
+                                   }
                                }
-                           }, (obj) => SaveFiles.Count > 0
+                           }, (obj) => SelectedSaveFile != null && SaveFiles.Count > 0
                        ));
             }
         }
@@ -110,13 +116,21 @@ namespace ViceCitySaveFileManager.ViewModels
                                    }
                                }
                            }, (obj) => SaveFiles.Count > 0
-                           ));
+                       ));
             }
         }
 
         private int GetMaxId()
         {
-            return SaveFiles.Select(saveFile => saveFile.Id).Concat(new[] {0}).Max() ;
+            return SaveFiles.Select(saveFile => saveFile.Id).Concat(new[] {0}).Max();
+        }
+
+        private void UpdateSaveFiles()
+        {
+            foreach (var saveFile in SaveFiles)
+            {
+                saveFile.LastMission = SaveFile.ReadLastMission(saveFile.Location);
+            }
         }
 
 

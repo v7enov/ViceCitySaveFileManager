@@ -12,9 +12,8 @@ namespace ViceCitySaveFileManager.Models
         public int Id { get; }
         private string _name;
         private string _description;
-        private string _lastMission;
-        private bool _fileExists;
         private ReplayFile _attachedReplayFile;
+        private string _lastMission;
 
         public string Name
         {
@@ -26,7 +25,13 @@ namespace ViceCitySaveFileManager.Models
             }
         }
 
-        public string Location => Path.Combine(GlobalConfig.GetSaveFilesPath(), $"{Id}.b");
+        public string Location
+        {
+            get
+            {
+                return Path.Combine(GlobalConfig.GetSaveFilesPath(), $"{Id}.b");
+            }
+        }
 
         public string Description
         {
@@ -38,9 +43,21 @@ namespace ViceCitySaveFileManager.Models
             }
         }
 
-        public string LastMission => ReadLastMission(Location);
+        public string LastMission
+        {
+            get
+            {
+                _lastMission = ReadLastMission(Location);
+                return _lastMission;
+            }
+            set
+            {
+                _lastMission = value;
+                OnPropertyChanged(nameof(LastMission));
+            } 
+        }
 
-        private string ReadLastMission(string path)
+        public static string ReadLastMission(string path)
         {
             var allBytes = File.ReadAllBytes(path);
             var newBytes = new List<byte>();
@@ -56,29 +73,17 @@ namespace ViceCitySaveFileManager.Models
                 {
                     counter++;
 
-                    if (counter == 2)
-                    {
-                        newBytes.RemoveAt(newBytes.Count - 1);
-                        break;
-                    }
+                    if (counter != 2) continue;
+                    newBytes.RemoveAt(newBytes.Count - 1);
+                    break;
                 }
-                else
-                {
-                    counter = 0;
-                }
+
+                counter = 0;
             }
             return Encoding.Unicode.GetString(newBytes.ToArray());
         }
 
-        public bool FileExists
-        {
-            get => File.Exists(Location);
-            set
-            {
-                _fileExists = value;
-                OnPropertyChanged(nameof(FileExists));
-            }
-        }
+        public bool FileExists => File.Exists(Location);
 
         public SaveFile(int id, string name, string description)
         {
