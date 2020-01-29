@@ -48,6 +48,11 @@ namespace ViceCitySaveFileManager.Models
             }
         }
 
+        public ReplayFile()
+        {
+
+        }
+
         public string Location => Path.Combine(GlobalConfig.GetReplayFilesPath(), $"{Id}.rep");
 
         public ReplayFile(int id, string name, string description)
@@ -71,6 +76,12 @@ namespace ViceCitySaveFileManager.Models
         public void UpdateState()
         {
             FileExists = File.Exists(Location);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is ReplayFile)) return false;
+            return (Id == ((ReplayFile)obj).Id);
         }
 
 

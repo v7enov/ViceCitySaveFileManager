@@ -56,7 +56,7 @@
         <TextBox Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2" Height="30" Width="290" DataContext="{Binding SelectedSaveFile}"  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
         <TextBox Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" Height="30" Width="290" DataContext="{Binding SelectedSaveFile}"  Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
 
-        <ComboBox Grid.Row="3" Grid.Column="4" Height="40" Width="130" IsEnabled="{Binding IsReplayFilesAvailable}" ItemsSource="{Binding ReplayFiles}"  SelectedItem="{Binding SelectedSaveFile.AttachedReplayFile}" DisplayMemberPath="Name" />
+        <ComboBox Grid.Row="3" Grid.Column="4" Height="40" Width="130" IsEnabled="{Binding IsReplayFilesAvailable}"  ItemsSource="{Binding ReplayFiles}"  SelectedItem="{Binding SelectedSaveFile.AttachedReplayFile}" DisplayMemberPath="Name" />
 
         <ListBox Grid.Row="5" Grid.Column="6" Grid.ColumnSpan="3" Grid.RowSpan="3" ItemsSource="{Binding ReplayFiles}" SelectedItem="{Binding SelectedReplayFile}">
             <ListBox.ItemTemplate>
@@ -76,6 +76,7 @@
         <TextBox Grid.Column="7" Grid.Row="3" Grid.ColumnSpan="2" Height="30" Width="290" DataContext="{Binding SelectedReplayFile}"  Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
         <Button Grid.Column="7" Grid.Row="4" Height="30" Width="130" Command="{Binding AttachReplayFile}" CommandParameter="{Binding SelectedReplayFile}" Content="Attach replay file"></Button>
         <Button Grid.Column="7" Grid.Row="5" Height="30" Width="130" Command="{Binding AddReplayRecord}" Content="Add replay file record"></Button>
+        <Button Grid.Column="9" Grid.Row="6" Height="30" Width="130" Command="{Binding SaveToDbCommand}" Content="Save Changes" />
 
     </Grid>
 </Window>

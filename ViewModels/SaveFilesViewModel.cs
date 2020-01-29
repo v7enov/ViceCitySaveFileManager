@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using ViceCitySaveFileManager.Annotations;
 using ViceCitySaveFileManager.Models;
+using ViceCitySaveFileManager.Helpers;
 
 namespace ViceCitySaveFileManager.ViewModels
 {
@@ -19,6 +20,8 @@ namespace ViceCitySaveFileManager.ViewModels
         private RelayCommand _addSaveFile;
         private RelayCommand _attachReplayFile;
         private RelayCommand _addReplayRecord;
+        private RelayCommand _saveToDbCommand;
+        private bool isSaved;
         private readonly IDialogService _dialogService = new DefaultDialogService();
 
         public ObservableCollection<SaveFile> SaveFiles { get; set; }
@@ -27,17 +30,8 @@ namespace ViceCitySaveFileManager.ViewModels
 
         public SaveFilesViewModel()
         {
-            SaveFiles = new ObservableCollection<SaveFile>
-            {
-                new SaveFile(1, "asdasd", "asdasdad"),
-                new SaveFile(2, "asdasdas", "asdasdasdasdasd")
-            };
-
-            ReplayFiles = new ObservableCollection<ReplayFile>
-            {
-                new ReplayFile(1, "asd", "asd"),
-                new ReplayFile(2, "asdasd", "asd")
-            };
+            SaveFiles = new ObservableCollection<SaveFile>(SQLiteDataAccess.LoadSaveFiles());
+            ReplayFiles = new ObservableCollection<ReplayFile>(SQLiteDataAccess.LoadReplayFiles());
         }
 
         public SaveFile SelectedSaveFile
@@ -169,9 +163,19 @@ namespace ViceCitySaveFileManager.ViewModels
             }
         }
 
+        public RelayCommand SaveToDbCommand {
+            get {
+                return _saveToDbCommand ??
+                      (_saveToDbCommand = new RelayCommand(obj =>
+                      {
+                          SQLiteDataAccess.Save(SaveFiles.ToList(), ReplayFiles.ToList());
+                      }));
+            }
+        }
+
         private int GetMaxId(bool isSavefiles)
         {
-            switch(isSavefiles)
+            switch (isSavefiles)
             {
                 case true:
                     return SaveFiles.Select(saveFile => saveFile.Id).Concat(new[] { 0 }).Max();

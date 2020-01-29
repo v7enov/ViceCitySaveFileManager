@@ -9,12 +9,13 @@ namespace ViceCitySaveFileManager.Models
 {
     public class SaveFile : INotifyPropertyChanged
     {
-        public int Id { get; }
+        public int Id { get; private set; }
         private string _name;
         private string _description;
         private ReplayFile _attachedReplayFile;
         private string _lastMission;
         private bool _fileExists;
+        private int _attachedReplayFileId;
 
         public string Name
         {
@@ -100,13 +101,32 @@ namespace ViceCitySaveFileManager.Models
             Description = description;
         }
 
+        public SaveFile()
+        {
+
+        }
+
         public ReplayFile AttachedReplayFile
         {
             get => _attachedReplayFile;
             set
             {
                 _attachedReplayFile = value;
+                _attachedReplayFileId = value.Id;
                 OnPropertyChanged(nameof(AttachedReplayFile));
+            }
+        }
+
+        public int AttachedReplayFileId 
+        {
+            get 
+            {
+                return _attachedReplayFileId;
+            } 
+            set 
+            {
+                _attachedReplayFileId = value;
+                OnPropertyChanged(nameof(AttachedReplayFileId));
             }
         }
 
