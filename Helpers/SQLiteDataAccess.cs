@@ -20,15 +20,16 @@ namespace ViceCitySaveFileManager.Helpers
 
                 var attachedReplays = cnn.Query<ReplayFile>("SELECT ReplayFiles.* FROM ReplayFiles INNER JOIN SaveFiles ON ReplayFiles.Id = SaveFiles.AttachedReplayFileId", new DynamicParameters());
 
+                var saveFiles = output as SaveFile[] ?? output.ToArray();
                 foreach (var replay in attachedReplays)
                 {
-                    foreach (var save in output.Where(x => x.AttachedReplayFileId == replay.Id))
+                    foreach (var save in saveFiles.Where(x => x.AttachedReplayFileId == replay.Id))
                     { 
                          save.AttachedReplayFile = replay;
                     }
                 }
 
-                return output.ToList();
+                return saveFiles.ToList();
             }
         }
 

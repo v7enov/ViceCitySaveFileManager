@@ -15,8 +15,6 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="20"/>
         </Grid.ColumnDefinitions>
@@ -32,51 +30,157 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
-        <ListBox Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="3" Grid.RowSpan="3" ItemsSource="{Binding SaveFiles}" SelectedItem="{Binding SelectedSaveFile}">
+
+        <ListBox Grid.Row="4" Grid.Column="7" Grid.ColumnSpan="2" Grid.RowSpan="4" ItemsSource="{Binding ReplayFiles}" SelectedItem="{Binding SelectedReplayFile}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Margin="5">
-                        <TextBlock FontSize="13" Text="{Binding Path=Name}" />
-                        <TextBlock FontSize="13" Text="{Binding Path=Description}" />
-                        <TextBlock FontSize="13" Text="{Binding Path=LastMission, Mode=OneWay}" />
-                        <CheckBox FontSize="13" IsChecked="{Binding Path=FileExists, Mode=OneWay}"></CheckBox>
+                    <StackPanel Margin="5" Orientation="Horizontal">
+                        <TextBlock Margin="0,0,30,0" FontSize="13" Text="{Binding Name}" />
+                        <CheckBox FontSize="13" IsChecked="{Binding FileExists}" />
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <Button Grid.Column="1" Grid.Row="1" Height="30" Width="130" Command="{Binding AddCommand}" Content="Add save file record"/>
-        <Button Grid.Column="1" Grid.Row="2" Height="30" Width="130" Command="{Binding RemoveCommand}" CommandParameter="{Binding SelectedSaveFile}" Content="Remove save file record"/>
-        <Button Grid.Column="1" Grid.Row="3" Height="30" Width="130" Command="{Binding AddSaveFile}" CommandParameter="{Binding SelectedSaveFile}" Content="Attach save file"></Button>
+
+        <DataGrid FontSize="13" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="4" Grid.RowSpan="7" ItemsSource="{Binding SaveFiles}" SelectedItem="{Binding SelectedSaveFile}" CanUserResizeColumns="False" AutoGenerateColumns="False" CanUserAddRows="False" >
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Id" IsReadOnly="True" Binding="{Binding Path=Id}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Path=Name}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Description" IsReadOnly="True" Binding="{Binding Path=Description}" Width="200"></DataGridTextColumn>
+                <DataGridTextColumn Header="Last mission" IsReadOnly="True" Binding="{Binding Path=LastMission}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Selected replay" IsReadOnly="True" Binding="{Binding Path=AttachedReplayFile}"></DataGridTextColumn>
+                <DataGridCheckBoxColumn Header="Attached file" IsReadOnly="True" Binding="{Binding Path=FileExists}"></DataGridCheckBoxColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Grid.Column="1" Grid.Row="1" Height="30" Width="140" Command="{Binding AddCommand}" Content="Add save file record"/>
+        <Button Grid.Column="1" Grid.Row="3" Height="30" Width="140" Command="{Binding RemoveCommand}" CommandParameter="{Binding SelectedSaveFile}" Content="Remove save file record"/>
+        <Button Grid.Column="1" Grid.Row="2" Height="30" Width="140" Command="{Binding AddSaveFile}" CommandParameter="{Binding SelectedSaveFile}" Content="Attach save file"></Button>
+        <Button Grid.Column="1" Grid.Row="4" Height="30" Width="140" Command="{Binding DeattachSaveFile}" CommandParameter="{Binding SelectedSaveFile}" Content="Deattach save file"></Button>
+        <Button Grid.Column="1" Grid.Row="5" Height="30" Width="140" Command="{Binding DeselectReplayFile}" CommandParameter="{Binding SelectedSaveFile}" Content="Deselect replay file"></Button>
+
+        <TextBlock Grid.Column="2" Grid.Row="3" Height="30" Width="150" Text="Select replay file to attach to this save file:" TextAlignment="Right" Visibility="{Binding IsReplayFilesAvailable}" TextWrapping="Wrap" />
+        <TextBox Grid.Column="2" Grid.Row="4" Grid.ColumnSpan="3" Height="30" Width="320" DataContext="{Binding SelectedSaveFile}"  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            <TextBox.Style>
+                <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                    <Style.Resources>
+                        <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                            <VisualBrush.Visual>
+                                <Label Content="Name" Foreground="LightGray" />
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Style.Resources>
+                    <Style.Triggers>
+                        <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                            <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Background" Value="White" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+        <TextBox Grid.Column="2" Grid.Row="5" Grid.ColumnSpan="3" Height="30" Width="320" DataContext="{Binding SelectedSaveFile}"  Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            <TextBox.Style>
+                <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                    <Style.Resources>
+                        <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                            <VisualBrush.Visual>
+                                <Label Content="Description" Foreground="LightGray" />
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Style.Resources>
+                    <Style.Triggers>
+                        <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                            <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Background" Value="White" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+
+        <ComboBox Grid.Row="3" Grid.Column="3" Height="30" Width="130" IsEnabled="{Binding IsReplayFilesAvailable}"  ItemsSource="{Binding ReplayFiles}"  SelectedItem="{Binding SelectedSaveFile.AttachedReplayFile}" DisplayMemberPath="Name" />
+        <StackPanel IsEnabled="{Binding IsMoveAvailable}" HorizontalAlignment="Center" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="3" Orientation="Horizontal">
+            <Button  Margin="0,0,5,0"  Height="30" Width="50" Content="Slot 1"></Button>
+            <Button Margin="0,0,5,0"  Height="30" Width="50" Content="Slot 2"></Button>
+            <Button Margin="0,0,5,0"  Height="30" Width="50" Content="Slot 3"></Button>
+            <Button Margin="0,0,5,0"  Height="30" Width="50" Content="Slot 4"></Button>
+            <Button Margin="0,0,5,0" Height="30" Width="50" Content="Slot 5"></Button>
+            <Button Margin="0,0,5,0" Height="30" Width="50" Content="Slot 6"></Button>
+            <Button Margin="0,0,5,0" Height="30" Width="50" Content="Slot 7"></Button>
+            <Button Margin="0,0,5,0" Height="30" Width="50" Content="Slot 8"></Button>
+        </StackPanel>
+        <TextBlock Grid.Column="2" Grid.Row="1" Text="Move to:" VerticalAlignment="Bottom" HorizontalAlignment="Center"></TextBlock>
 
 
-        <TextBlock Grid.Column="2" Grid.Row="1" Height="30" Width="150" DataContext="{Binding SelectedSaveFile}" Text="{Binding Id}"/>
-        <TextBox Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="2" Height="30" Width="290" DataContext="{Binding SelectedSaveFile}"  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
-        <TextBox Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="2" Height="30" Width="290" DataContext="{Binding SelectedSaveFile}"  Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
 
-        <ComboBox Grid.Row="3" Grid.Column="4" Height="40" Width="130" IsEnabled="{Binding IsReplayFilesAvailable}"  ItemsSource="{Binding ReplayFiles}"  SelectedItem="{Binding SelectedSaveFile.AttachedReplayFile}" DisplayMemberPath="Name" />
-
-        <ListBox Grid.Row="5" Grid.Column="6" Grid.ColumnSpan="3" Grid.RowSpan="3" ItemsSource="{Binding ReplayFiles}" SelectedItem="{Binding SelectedReplayFile}">
-            <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Margin="5">
-                            <TextBlock FontSize="13" Text="{Binding Name}" />
-                            <TextBlock FontSize="13" Text="{Binding Description}" />
-                            <CheckBox FontSize="13" IsChecked="{Binding FileExists}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-        </ListBox>
-
-
-        <TextBlock Grid.Column="7" Grid.Row="1" Height="30" Width="150" DataContext="{Binding SelectedReplayFile}" Text="{Binding Id}"/>
-        <TextBox Grid.Column="7" Grid.Row="2" Grid.ColumnSpan="2" Height="30" Width="290" DataContext="{Binding SelectedReplayFile}"  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
-        <TextBox Grid.Column="7" Grid.Row="3" Grid.ColumnSpan="2" Height="30" Width="290" DataContext="{Binding SelectedReplayFile}"  Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"></TextBox>
-        <Button Grid.Column="7" Grid.Row="4" Height="30" Width="130" Command="{Binding AttachReplayFile}" CommandParameter="{Binding SelectedReplayFile}" Content="Attach replay file"></Button>
-        <Button Grid.Column="7" Grid.Row="5" Height="30" Width="130" Command="{Binding AddReplayRecord}" Content="Add replay file record"></Button>
-        <Button Grid.Column="9" Grid.Row="6" Height="30" Width="130" Command="{Binding SaveToDbCommand}" Content="Save Changes" />
+        <TextBox Grid.Column="7" Grid.Row="2" Grid.ColumnSpan="2" Height="30" Width="280" DataContext="{Binding SelectedReplayFile}"  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            <TextBox.Style>
+                <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                    <Style.Resources>
+                        <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                            <VisualBrush.Visual>
+                                <Label Content="Name" Foreground="LightGray" />
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Style.Resources>
+                    <Style.Triggers>
+                        <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                            <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Background" Value="White" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+        <TextBox Grid.Column="7" Grid.Row="3" Grid.ColumnSpan="2" Height="30" Width="280" DataContext="{Binding SelectedReplayFile}"  Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+            <TextBox.Style>
+                <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                    <Style.Resources>
+                        <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                            <VisualBrush.Visual>
+                                <Label Content="Description" Foreground="LightGray" />
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Style.Resources>
+                    <Style.Triggers>
+                        <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                            <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Background" Value="White" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+        <Button Grid.Column="6" Grid.Row="3" Height="30" Width="130" Command="{Binding AttachReplayFile}" CommandParameter="{Binding SelectedReplayFile}" Content="Attach replay file"></Button>
+        <Button Grid.Column="6" Grid.Row="2" Height="30" Width="130" Command="{Binding AddReplayRecord}" Content="Add replay record"></Button>
+        <Button Grid.Column="6" Grid.Row="4" Height="30" Width="130" Command="{Binding RemoveReplayRecord}" CommandParameter="{Binding SelectedReplayFile}" Content="Remove replay record"></Button>
+        <Button Grid.Column="6" Grid.Row="5" Height="30" Width="130" Command="{Binding DeattachReplayFile}" CommandParameter="{Binding SelectedReplayFile}" Content="Deattach replay file"></Button>
+        <Button Grid.Column="8" Grid.Row="1" Height="30" Width="130" Command="{Binding SaveToDbCommand}" Content="Save Changes" />
 
     </Grid>
 </Window>

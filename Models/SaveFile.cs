@@ -112,7 +112,7 @@ namespace ViceCitySaveFileManager.Models
             set
             {
                 _attachedReplayFile = value;
-                _attachedReplayFileId = value.Id;
+                if (value != null) _attachedReplayFileId = value.Id;
                 OnPropertyChanged(nameof(AttachedReplayFile));
             }
         }

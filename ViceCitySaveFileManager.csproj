@@ -74,8 +74,10 @@
     </Compile>
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="Helpers\SQLiteDataAccess.cs" />
+    <Compile Include="Helpers\TrulyObservableCollection.cs" />
     <Compile Include="Models\ReplayFile.cs" />
     <Compile Include="Models\SaveFile.cs" />
+    <Compile Include="Models\SaveSlot.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewModels\DefaultDialogService.cs" />
     <Compile Include="ViewModels\IDialogService.cs" />

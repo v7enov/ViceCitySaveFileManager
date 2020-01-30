@@ -84,6 +84,10 @@ namespace ViceCitySaveFileManager.Models
             return (Id == ((ReplayFile)obj).Id);
         }
 
+        public override string ToString()
+        {
+            return Name;
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

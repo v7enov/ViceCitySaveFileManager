@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using ViceCitySaveFileManager.Annotations;
 using ViceCitySaveFileManager.Models;
@@ -21,17 +23,25 @@ namespace ViceCitySaveFileManager.ViewModels
         private RelayCommand _attachReplayFile;
         private RelayCommand _addReplayRecord;
         private RelayCommand _saveToDbCommand;
-        private bool isSaved;
+        private RelayCommand _deattachSaveFile;
+        private RelayCommand _deselectReplayFile;
+        private RelayCommand _deattachReplayFile;
+        private RelayCommand _removeReplayRecord;
+        private bool _isSaved;
         private readonly IDialogService _dialogService = new DefaultDialogService();
 
-        public ObservableCollection<SaveFile> SaveFiles { get; set; }
-        public ObservableCollection<ReplayFile> ReplayFiles { get; set; }
+        public TrulyObservableCollection<SaveFile> SaveFiles { get; set; }
+        public TrulyObservableCollection<ReplayFile> ReplayFiles { get; set; }
 
 
         public SaveFilesViewModel()
         {
-            SaveFiles = new ObservableCollection<SaveFile>(SQLiteDataAccess.LoadSaveFiles());
-            ReplayFiles = new ObservableCollection<ReplayFile>(SQLiteDataAccess.LoadReplayFiles());
+            SaveFiles = new TrulyObservableCollection<SaveFile>(SQLiteDataAccess.LoadSaveFiles());
+            ReplayFiles = new TrulyObservableCollection<ReplayFile>(SQLiteDataAccess.LoadReplayFiles());
+
+            ReplayFiles.CollectionChanged += OnCollectionChanged;
+            SaveFiles.CollectionChanged += OnCollectionChanged;
+            _isSaved = true;
         }
 
         public SaveFile SelectedSaveFile
@@ -42,6 +52,7 @@ namespace ViceCitySaveFileManager.ViewModels
                 _selectedSaveFile = value;
                 OnPropertyChanged(nameof(SelectedSaveFile));
                 OnPropertyChanged(nameof(IsReplayFilesAvailable));
+                OnPropertyChanged(nameof(IsMoveAvailable));
             }
         }
 
@@ -54,6 +65,8 @@ namespace ViceCitySaveFileManager.ViewModels
         }
 
         public bool IsReplayFilesAvailable => ReplayFiles.Count > 0 && SelectedSaveFile != null;
+
+        public bool IsMoveAvailable => SelectedSaveFile != null && SelectedSaveFile.FileExists;
 
         public RelayCommand AddCommand
         {
@@ -158,7 +171,97 @@ namespace ViceCitySaveFileManager.ViewModels
                                        throw;
                                    }
                                }
-                           }, (obj) => SaveFiles.Count > 0
+                           }, (obj) => SaveFiles.Count > 0 && SelectedSaveFile != null
+                       ));
+            }
+        }
+
+        public RelayCommand DeattachSaveFile {
+            get {
+                return _deattachSaveFile ??
+                       (_deattachSaveFile = new RelayCommand(obj =>
+                           {
+                               if (obj is SaveFile saveFile)
+                               {
+                                   try
+                                   {
+                                       File.Delete(saveFile.Location);
+                                   }
+                                   catch (Exception e)
+                                   {
+                                       _dialogService.ShowMessage(e.Message);
+                                       throw;
+                                   }
+                                   finally
+                                   {
+                                       saveFile.UpdateState();
+                                   }
+                               }
+                           }, (obj) => SaveFiles.Count > 0 && SelectedSaveFile != null && SelectedSaveFile.FileExists 
+                       ));
+            }
+        }
+
+        public RelayCommand DeselectReplayFile {
+            get {
+                return _deselectReplayFile ??
+                       (_deselectReplayFile = new RelayCommand(obj =>
+                           {
+                               if (obj is SaveFile saveFile)
+                               {
+                                   saveFile.AttachedReplayFile = null;
+                                   saveFile.AttachedReplayFileId = default;
+                               }
+                           }, (obj) => SaveFiles.Count > 0 && SelectedSaveFile != null && SelectedSaveFile.AttachedReplayFile != null
+                       ));
+            }
+        }
+
+        public RelayCommand RemoveReplayRecord {
+            get {
+                return _removeReplayRecord ??
+                       (_removeReplayRecord = new RelayCommand(obj =>
+                           {
+                               if (obj is ReplayFile replayFile)
+                               {
+                                   ReplayFiles.Remove(replayFile);
+                                   try
+                                   {
+                                       File.Delete(replayFile.Location);
+                                   }
+                                   catch (Exception e)
+                                   {
+                                       _dialogService.ShowMessage(e.Message);
+                                       throw;
+                                   }
+                               }
+                           }, (obj) => ReplayFiles.Count > 0 && SelectedReplayFile != null
+                       ));
+            }
+        }
+
+        public RelayCommand DeattachReplayFile {
+            get {
+                return _deattachReplayFile ??
+                       (_deattachReplayFile = new RelayCommand(obj =>
+                           {
+                               if (obj is ReplayFile replayFile)
+                               {
+                                   try
+                                   {
+                                       File.Delete(replayFile.Location);
+                                   }
+                                   catch (Exception e)
+                                   {
+                                       _dialogService.ShowMessage(e.Message);
+                                       throw;
+                                   }
+                                   finally
+                                   {
+                                       replayFile.UpdateState();
+                                   }
+                               }
+                           }, (obj) => ReplayFiles.Count > 0 && SelectedReplayFile != null && SelectedReplayFile.FileExists
                        ));
             }
         }
@@ -168,8 +271,13 @@ namespace ViceCitySaveFileManager.ViewModels
                 return _saveToDbCommand ??
                       (_saveToDbCommand = new RelayCommand(obj =>
                       {
-                          SQLiteDataAccess.Save(SaveFiles.ToList(), ReplayFiles.ToList());
-                      }));
+                          {
+                              Task.Factory.StartNew(() =>
+                                  SQLiteDataAccess.Save(SaveFiles.ToList(), ReplayFiles.ToList())
+                                  );
+                              _isSaved = true;
+                          }
+                      }, (obj) => !_isSaved));
             }
         }
 
@@ -189,6 +297,11 @@ namespace ViceCitySaveFileManager.ViewModels
         {
             foreach (var saveFile in SaveFiles) saveFile.UpdateState();
             foreach (var replayFile in ReplayFiles) replayFile.UpdateState();
+        }
+
+        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            _isSaved = false;
         }
 
 
