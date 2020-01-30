@@ -10,7 +10,7 @@ using ViceCitySaveFileManager.Annotations;
 
 namespace ViceCitySaveFileManager.Models
 {
-    class SaveSlot : INotifyPropertyChanged
+    public class SaveSlot : INotifyPropertyChanged
     {
         private static readonly List<string> Names = new List<string>()
         {
@@ -52,17 +52,33 @@ namespace ViceCitySaveFileManager.Models
             }
         }
 
-        public string FileName => GlobalConfig.GetVCSaveFilesDirectory() + Names[SlotNumber - 1];
+        public string FileName => Path.Combine(GlobalConfig.GetVCSaveFilesDirectory(), Names[SlotNumber - 1]);
+
+        public string ReplayFileName => Path.Combine(GlobalConfig.GetVCSaveFilesDirectory(), "replay.rep");
 
         public bool SaveFileEquals
         {
-            get => FilesAreEqual(new FileInfo(FileName), new FileInfo(AttachedSaveFile.Location));
+            get {
+                if (AttachedSaveFile == null) return false;
+                    return FilesAreEqual(new FileInfo(FileName), new FileInfo(AttachedSaveFile.Location));
+            }
             set
             {
                 _saveFileEquals = value;
                 OnPropertyChanged(nameof(SaveFileEquals));
             }
         } 
+
+        public SaveSlot()
+        {
+
+        }
+
+        public SaveSlot(int slotNumber, SaveFile save)
+        {
+            SlotNumber = slotNumber;
+            AttachedSaveFile = save;
+        }
 
         private static bool FilesAreEqual(FileInfo first, FileInfo second)
         {

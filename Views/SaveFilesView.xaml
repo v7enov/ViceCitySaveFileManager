@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="SaveFilesView" Height="720" Width="1280" FontSize="12">
+        Title="GTA:VC Save files manager" Height="720" Width="1280" FontSize="12">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
@@ -32,6 +32,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
@@ -47,7 +48,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <DataGrid FontSize="13" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="4" Grid.RowSpan="7" ItemsSource="{Binding SaveFiles}" SelectedItem="{Binding SelectedSaveFile}" CanUserResizeColumns="False" AutoGenerateColumns="False" CanUserAddRows="False" >
+        <DataGrid FontSize="13" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="4" Grid.RowSpan="8" ItemsSource="{Binding SaveFiles}" SelectedItem="{Binding SelectedSaveFile}" CanUserResizeColumns="False" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single" >
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Id" IsReadOnly="True" Binding="{Binding Path=Id}"></DataGridTextColumn>
                 <DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Path=Name}"></DataGridTextColumn>
@@ -64,7 +65,7 @@
         <Button Grid.Column="1" Grid.Row="5" Height="30" Width="140" Command="{Binding DeselectReplayFile}" CommandParameter="{Binding SelectedSaveFile}" Content="Deselect replay file"></Button>
 
         <TextBlock Grid.Column="2" Grid.Row="3" Height="30" Width="150" Text="Select replay file to attach to this save file:" TextAlignment="Right" Visibility="{Binding IsReplayFilesAvailable}" TextWrapping="Wrap" />
-        <TextBox Grid.Column="2" Grid.Row="4" Grid.ColumnSpan="3" Height="30" Width="320" DataContext="{Binding SelectedSaveFile}"  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+        <TextBox Grid.Column="2" Grid.Row="4" Grid.ColumnSpan="3" Height="30" Width="320" DataContext="{Binding SelectedSaveFile}" MaxLength="23" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             <TextBox.Style>
                 <Style TargetType="TextBox" xmlns:sys="clr-namespace:System;assembly=mscorlib">
                     <Style.Resources>
@@ -115,14 +116,14 @@
 
         <ComboBox Grid.Row="3" Grid.Column="3" Height="30" Width="130" IsEnabled="{Binding IsReplayFilesAvailable}"  ItemsSource="{Binding ReplayFiles}"  SelectedItem="{Binding SelectedSaveFile.AttachedReplayFile}" DisplayMemberPath="Name" />
         <StackPanel IsEnabled="{Binding IsMoveAvailable}" HorizontalAlignment="Center" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="3" Orientation="Horizontal">
-            <Button  Margin="0,0,5,0"  Height="30" Width="50" Content="Slot 1"></Button>
-            <Button Margin="0,0,5,0"  Height="30" Width="50" Content="Slot 2"></Button>
-            <Button Margin="0,0,5,0"  Height="30" Width="50" Content="Slot 3"></Button>
-            <Button Margin="0,0,5,0"  Height="30" Width="50" Content="Slot 4"></Button>
-            <Button Margin="0,0,5,0" Height="30" Width="50" Content="Slot 5"></Button>
-            <Button Margin="0,0,5,0" Height="30" Width="50" Content="Slot 6"></Button>
-            <Button Margin="0,0,5,0" Height="30" Width="50" Content="Slot 7"></Button>
-            <Button Margin="0,0,5,0" Height="30" Width="50" Content="Slot 8"></Button>
+            <Button Margin="0,0,5,0"  Height="30" Width="50" Content="Slot 1" Command="{Binding MoveToSlot}" CommandParameter="1"></Button>
+            <Button Margin="0,0,5,0"  Height="30" Width="50" Content="Slot 2" Command="{Binding MoveToSlot}" CommandParameter="2"></Button>
+            <Button Margin="0,0,5,0"  Height="30" Width="50" Content="Slot 3" Command="{Binding MoveToSlot}" CommandParameter="3"></Button>
+            <Button Margin="0,0,5,0"  Height="30" Width="50" Content="Slot 4" Command="{Binding MoveToSlot}" CommandParameter="4"></Button>
+            <Button Margin="0,0,5,0" Height="30" Width="50" Content="Slot 5" Command="{Binding MoveToSlot}" CommandParameter="5"></Button>
+            <Button Margin="0,0,5,0" Height="30" Width="50" Content="Slot 6" Command="{Binding MoveToSlot}" CommandParameter="6"></Button>
+            <Button Margin="0,0,5,0" Height="30" Width="50" Content="Slot 7" Command="{Binding MoveToSlot}" CommandParameter="7"></Button>
+            <Button Margin="0,0,5,0" Height="30" Width="50" Content="Slot 8" Command="{Binding MoveToSlot}" CommandParameter="8"></Button>
         </StackPanel>
         <TextBlock Grid.Column="2" Grid.Row="1" Text="Move to:" VerticalAlignment="Bottom" HorizontalAlignment="Center"></TextBlock>
 
@@ -181,6 +182,19 @@
         <Button Grid.Column="6" Grid.Row="4" Height="30" Width="130" Command="{Binding RemoveReplayRecord}" CommandParameter="{Binding SelectedReplayFile}" Content="Remove replay record"></Button>
         <Button Grid.Column="6" Grid.Row="5" Height="30" Width="130" Command="{Binding DeattachReplayFile}" CommandParameter="{Binding SelectedReplayFile}" Content="Deattach replay file"></Button>
         <Button Grid.Column="8" Grid.Row="1" Height="30" Width="130" Command="{Binding SaveToDbCommand}" Content="Save Changes" />
+
+
+        <ListBox Grid.Row="9" Grid.Column="6" Grid.ColumnSpan="3" Grid.RowSpan="5" ItemsSource="{Binding SaveSlots}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="5" Orientation="Horizontal">
+                        <TextBlock Margin="0,0,30,0" FontSize="13" Text="{Binding SlotNumber}" />
+                        <TextBlock Margin="0,0,30,0" FontSize="13" Text="{Binding AttachedSaveFile.Name}" />
+                        <CheckBox FontSize="13" IsChecked="{Binding SaveFileEquals}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
     </Grid>
 </Window>

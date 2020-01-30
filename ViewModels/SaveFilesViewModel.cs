@@ -27,20 +27,24 @@ namespace ViceCitySaveFileManager.ViewModels
         private RelayCommand _deselectReplayFile;
         private RelayCommand _deattachReplayFile;
         private RelayCommand _removeReplayRecord;
+        private RelayCommand _moveToSlot;
         private bool _isSaved;
         private readonly IDialogService _dialogService = new DefaultDialogService();
 
         public TrulyObservableCollection<SaveFile> SaveFiles { get; set; }
         public TrulyObservableCollection<ReplayFile> ReplayFiles { get; set; }
+        public TrulyObservableCollection<SaveSlot> SaveSlots { get; set; }
 
 
         public SaveFilesViewModel()
         {
             SaveFiles = new TrulyObservableCollection<SaveFile>(SQLiteDataAccess.LoadSaveFiles());
             ReplayFiles = new TrulyObservableCollection<ReplayFile>(SQLiteDataAccess.LoadReplayFiles());
+            SaveSlots = new TrulyObservableCollection<SaveSlot>(SQLiteDataAccess.LoadSaveSlots());
 
             ReplayFiles.CollectionChanged += OnCollectionChanged;
             SaveFiles.CollectionChanged += OnCollectionChanged;
+            SaveSlots.CollectionChanged += OnCollectionChanged;
             _isSaved = true;
         }
 
@@ -273,11 +277,60 @@ namespace ViceCitySaveFileManager.ViewModels
                       {
                           {
                               Task.Factory.StartNew(() =>
-                                  SQLiteDataAccess.Save(SaveFiles.ToList(), ReplayFiles.ToList())
+                                  SQLiteDataAccess.Save(SaveFiles.ToList(), ReplayFiles.ToList(), SaveSlots.ToList())
                                   );
                               _isSaved = true;
                           }
                       }, (obj) => !_isSaved));
+            }
+        }
+
+        public RelayCommand MoveToSlot {
+            get {
+                return _moveToSlot ??
+                      (_moveToSlot = new RelayCommand(obj =>
+                      {
+                          {
+                              foreach (var slot in SaveSlots.Where(x => x.SlotNumber == int.Parse(obj.ToString())))
+                              {
+                                  slot.AttachedSaveFile = SelectedSaveFile;
+                                  slot.AttachedSaveFileId = SelectedSaveFile.Id;
+                                  SaveFile.WriteIngameName(SelectedSaveFile.Location, SelectedSaveFile.Name);
+
+                                  try
+                                  {
+                                      File.Copy(SelectedSaveFile.Location, slot.FileName, true);
+                                  }
+                                  catch (Exception e)
+                                  {
+                                      _dialogService.ShowMessage(e.Message);
+                                  }
+                                  finally
+                                  {
+                                      slot.UpdateState();
+                                  }
+
+                                  if (SelectedSaveFile.AttachedReplayFile != null)
+                                  {
+                                      if (SelectedSaveFile.AttachedReplayFile.FileExists)
+                                      {
+                                          try
+                                          {
+                                              File.Copy(SelectedSaveFile.AttachedReplayFile.Location, slot.ReplayFileName, true);
+                                          }
+                                          catch (Exception e)
+                                          {
+                                              _dialogService.ShowMessage(e.Message);
+                                          }
+                                          finally
+                                          {
+                                              slot.UpdateState();
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                      }));
             }
         }
 

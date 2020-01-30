@@ -33,6 +33,26 @@ namespace ViceCitySaveFileManager.Helpers
             }
         }
 
+        public static List<SaveSlot> LoadSaveSlots()
+        {
+            using (var cnn = new SQLiteConnection(LoadConnectionString()))
+            {
+                var output = cnn.Query<SaveSlot>("select SlotNumber, AttachedSaveFileId from SaveSlots ", new DynamicParameters());
+                var attachedSaveFiles = cnn.Query<SaveFile>("SELECT SaveFiles.* FROM SaveFiles INNER JOIN SaveSlots ON SaveSlots.AttachedSaveFileId = SaveFiles.Id", new DynamicParameters());
+                var saveSlots = output as SaveSlot[] ?? output.ToArray();
+
+                foreach (var saveFile in attachedSaveFiles)
+                {
+                    foreach (var slot in saveSlots.Where(x => x.AttachedSaveFileId == saveFile.Id))
+                    {
+                        slot.AttachedSaveFile = saveFile;
+                    }
+                }
+
+                return saveSlots.ToList();
+            }
+        }
+
         public static List<ReplayFile> LoadReplayFiles()
         {
             using (var cnn = new SQLiteConnection(LoadConnectionString()))
@@ -42,15 +62,7 @@ namespace ViceCitySaveFileManager.Helpers
             }
         }
 
-        public static void SaveSaveFiles(SaveFile saveFile)
-        {
-            using (var cnn = new SQLiteConnection(LoadConnectionString()))
-            {
-                cnn.Execute("insert into SaveFiles (Name, Description, AttachedReplayFile) values (@Name, @Description, @ AttachedReplayFile)", saveFile);
-            }
-        }
-
-        public static void Save(List<SaveFile> saveFiles, List<ReplayFile> replayFiles)
+        public static void Save(List<SaveFile> saveFiles, List<ReplayFile> replayFiles, List<SaveSlot> saveSlots)
         {
             using (var cnn = new SQLiteConnection(LoadConnectionString()))
             {
@@ -65,6 +77,12 @@ namespace ViceCitySaveFileManager.Helpers
                 foreach (var item in replayFiles)
                 {
                     cnn.Execute("insert into ReplayFiles (Id, Name, Description) values (@Id, @Name, @Description)", item);
+                }
+
+                cnn.Execute("delete from SaveSlots");
+                foreach (var item in saveSlots)
+                {
+                    cnn.Execute("insert into SaveSlots (SlotNumber, AttachedSaveFileId) values (@SlotNumber, @AttachedSaveFileId)", item);
                 }
             }
         }

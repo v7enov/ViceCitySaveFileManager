@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Windows;
 using ViceCitySaveFileManager.Annotations;
+using ViceCitySaveFileManager.ViewModels;
 
 namespace ViceCitySaveFileManager.Models
 {
@@ -78,6 +81,43 @@ namespace ViceCitySaveFileManager.Models
                 counter = 0;
             }
             return Encoding.Unicode.GetString(newBytes.ToArray());
+        }
+
+        public static void WriteIngameName(string path, string str)
+        {
+            using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Open)))
+            {
+                writer.BaseStream.Seek(4, SeekOrigin.Begin);
+                int length = Math.Min(str.Length, 23);
+                // Пробегаемся по символам строки
+                for (int i = 0; i < length; ++i)
+                {
+                    // Записываем символ в файл
+                    writer.Write(Convert.ToUInt16(str[i]));
+                }
+                // Добавляем завершающий символ с кодом 0x0000
+                writer.Write(Convert.ToUInt16('\0'));
+            }
+            FixCheckSum(path);
+        }
+
+        public static void FixCheckSum(string path)
+        {
+            uint checkSum = 0;
+            using (BinaryReader reader = new BinaryReader(File.Open(path, FileMode.Open)))
+            {
+                // Суммируем все байты
+                while (reader.BaseStream.Position < reader.BaseStream.Length && reader.BaseStream.Position < 201824)
+                {
+                    checkSum += reader.ReadByte();
+                }
+            }
+            using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Open)))
+            {
+                // Сохраняем новую чек-сумму
+                writer.BaseStream.Seek(201824, SeekOrigin.Begin);
+                writer.Write(checkSum);
+            }
         }
 
         public bool FileExists
