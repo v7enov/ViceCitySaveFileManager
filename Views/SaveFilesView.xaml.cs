@@ -8,7 +8,6 @@ namespace ViceCitySaveFileManager.Views
     /// </summary>
     public partial class SaveFilesView : Window
     {
-
         public SaveFilesView()
         {
             InitializeComponent();

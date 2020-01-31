@@ -28,7 +28,7 @@ namespace ViceCitySaveFileManager.ViewModels
         private RelayCommand _deattachReplayFile;
         private RelayCommand _removeReplayRecord;
         private RelayCommand _moveToSlot;
-        private bool _isSaved;
+        private static bool _isSaved;
         private readonly IDialogService _dialogService = new DefaultDialogService();
 
         public TrulyObservableCollection<SaveFile> SaveFiles { get; set; }
@@ -38,6 +38,7 @@ namespace ViceCitySaveFileManager.ViewModels
 
         public SaveFilesViewModel()
         {
+            if (Application.Current.MainWindow != null) Application.Current.MainWindow.Closing += OnWindowClosing;
             SaveFiles = new TrulyObservableCollection<SaveFile>(SQLiteDataAccess.LoadSaveFiles());
             ReplayFiles = new TrulyObservableCollection<ReplayFile>(SQLiteDataAccess.LoadReplayFiles());
             SaveSlots = new TrulyObservableCollection<SaveSlot>(SQLiteDataAccess.LoadSaveSlots());
@@ -303,7 +304,7 @@ namespace ViceCitySaveFileManager.ViewModels
                               {
                                   slot.AttachedSaveFile = SelectedSaveFile;
                                   slot.AttachedSaveFileId = SelectedSaveFile.Id;
-                                  SaveFile.WriteIngameName(SelectedSaveFile.Location, SelectedSaveFile.Name);
+                                  SaveFile.WriteInGameName(SelectedSaveFile.Location, SelectedSaveFile.Name);
 
                                   try
                                   {
@@ -363,6 +364,16 @@ namespace ViceCitySaveFileManager.ViewModels
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             _isSaved = false;
+        }
+
+        public static void OnWindowClosing(object sender, CancelEventArgs e)
+        {
+            if (!_isSaved)
+            {
+                var messageBoxResult = MessageBox.Show("There are unsaved changes encountered, do you really wish to exit?", "Confirmation", MessageBoxButton.YesNo);
+
+                e.Cancel = messageBoxResult != MessageBoxResult.Cancel;
+            }
         }
 
 
