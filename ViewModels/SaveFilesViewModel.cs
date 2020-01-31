@@ -53,18 +53,26 @@ namespace ViceCitySaveFileManager.ViewModels
             get => _selectedSaveFile;
             set
             {
-                _selectedSaveFile = value;
-                OnPropertyChanged(nameof(SelectedSaveFile));
-                OnPropertyChanged(nameof(IsReplayFilesAvailable));
-                OnPropertyChanged(nameof(IsMoveAvailable));
+                if (value != null)
+                {
+                    _selectedSaveFile = value;
+                    OnPropertyChanged(nameof(SelectedSaveFile));
+                    OnPropertyChanged(nameof(IsReplayFilesAvailable));
+                    OnPropertyChanged(nameof(IsMoveAvailable));
+                }
             }
         }
 
-        public ReplayFile SelectedReplayFile {
+        public ReplayFile SelectedReplayFile 
+        {
             get => _selectedReplayFile;
-            set {
-                _selectedReplayFile = value;
-                OnPropertyChanged(nameof(SelectedReplayFile));
+            set 
+            {
+                if (value != null)
+                {
+                    _selectedReplayFile = value;
+                    OnPropertyChanged(nameof(SelectedReplayFile));
+                }
             }
         }
 
