@@ -19,6 +19,7 @@ namespace ViceCitySaveFileManager.Views
         private void Initialize()
         {
             GlobalConfig.CreateDirectories();
+            GlobalConfig.GrantAccess(GlobalConfig.GetVCSaveFilesDirectory());
         }
     }
 }

@@ -28,6 +28,7 @@ namespace ViceCitySaveFileManager.ViewModels
         private RelayCommand _deattachReplayFile;
         private RelayCommand _removeReplayRecord;
         private RelayCommand _moveToSlot;
+        private RelayCommand _clearAllSlots;
         private bool _isSaved;
         private readonly IDialogService _dialogService = new DefaultDialogService();
 
@@ -327,6 +328,30 @@ namespace ViceCitySaveFileManager.ViewModels
                                               slot.UpdateState();
                                           }
                                       }
+                                  }
+                              }
+                          }
+                      }));
+            }
+        }
+
+
+        public RelayCommand ClearAllSlots {
+            get {
+                return _clearAllSlots ??
+                      (_clearAllSlots = new RelayCommand(obj =>
+                      {
+                          {
+                              SaveSlots.Clear();
+                              foreach (var item in Directory.GetFiles(GlobalConfig.GetVCSaveFilesDirectory()).Where(x => !x.Contains("gta_vc.set")))
+                              {
+                                  try
+                                  {
+                                      File.Delete(item);
+                                  }
+                                  catch (Exception e)
+                                  {
+                                      _dialogService.ShowMessage(e.Message);
                                   }
                               }
                           }

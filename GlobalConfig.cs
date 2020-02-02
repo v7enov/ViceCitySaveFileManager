@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,6 +18,20 @@ namespace ViceCitySaveFileManager
         private static string GetApplicationBasePath()
         {
             return AppDomain.CurrentDomain.BaseDirectory;
+        }
+
+        public static void GrantAccess(string fullPath)
+        {
+            var dInfo = new DirectoryInfo(fullPath);
+            var dSecurity = dInfo.GetAccessControl();
+            dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+            dInfo.SetAccessControl(dSecurity);
+
+            foreach (var item in Directory.GetFiles(fullPath))
+            {
+                var fi = new FileInfo(item);
+                if (fi.IsReadOnly) fi.IsReadOnly = false;
+            }
         }
 
         public static string GetSaveFilesPath()

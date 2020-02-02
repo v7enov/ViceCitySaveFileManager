@@ -195,6 +195,8 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        <Button Command="{Binding ClearAllSlots}" Grid.Column="6" Grid.Row="8" Height="30" Width="130" Content="Clear all slots"/>
+
 
     </Grid>
 </Window>
