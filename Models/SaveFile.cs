@@ -83,7 +83,7 @@ namespace ViceCitySaveFileManager.Models
             return Encoding.Unicode.GetString(newBytes.ToArray());
         }
 
-        public static void WriteIngameName(string path, string str)
+        public static void WriteInGameName(string path, string str)
         {
             using (BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Open)))
             {
