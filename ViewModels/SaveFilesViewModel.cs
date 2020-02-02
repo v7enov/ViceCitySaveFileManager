@@ -10,6 +10,7 @@ using System.Windows;
 using ViceCitySaveFileManager.Annotations;
 using ViceCitySaveFileManager.Models;
 using ViceCitySaveFileManager.Helpers;
+using System.Windows.Forms;
 
 namespace ViceCitySaveFileManager.ViewModels
 {
@@ -29,6 +30,7 @@ namespace ViceCitySaveFileManager.ViewModels
         private RelayCommand _removeReplayRecord;
         private RelayCommand _moveToSlot;
         private RelayCommand _clearAllSlots;
+        private RelayCommand _exportSaveFilesFromDirectory;
         private static bool _isSaved;
         private readonly IDialogService _dialogService = new DefaultDialogService();
 
@@ -39,7 +41,7 @@ namespace ViceCitySaveFileManager.ViewModels
 
         public SaveFilesViewModel()
         {
-            if (Application.Current.MainWindow != null) Application.Current.MainWindow.Closing += OnWindowClosing;
+            if (System.Windows.Application.Current.MainWindow != null) System.Windows.Application.Current.MainWindow.Closing += OnWindowClosing;
             SaveFiles = new TrulyObservableCollection<SaveFile>(SQLiteDataAccess.LoadSaveFiles());
             ReplayFiles = new TrulyObservableCollection<ReplayFile>(SQLiteDataAccess.LoadReplayFiles());
             SaveSlots = new TrulyObservableCollection<SaveSlot>(SQLiteDataAccess.LoadSaveSlots());
@@ -111,7 +113,7 @@ namespace ViceCitySaveFileManager.ViewModels
                                    }
                                    catch (Exception e)
                                    {
-                                       MessageBox.Show(e.Message);
+                                       System.Windows.MessageBox.Show(e.Message);
                                        throw;
                                    }
                                    finally
@@ -138,7 +140,7 @@ namespace ViceCitySaveFileManager.ViewModels
                                }
                                catch (Exception e)
                                {
-                                   MessageBox.Show(e.Message);
+                                   System.Windows.MessageBox.Show(e.Message);
                                    throw;
                                }
                                finally
@@ -367,6 +369,41 @@ namespace ViceCitySaveFileManager.ViewModels
             }
         }
 
+
+        public RelayCommand ExportSaveFilesFromDirectory {
+            get {
+                return _exportSaveFilesFromDirectory ??
+                      (_exportSaveFilesFromDirectory = new RelayCommand(obj =>
+                      {
+                          {
+                              using (var fbd = new FolderBrowserDialog())
+                              {
+                                  var result = fbd.ShowDialog();
+
+                                  if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                                  {
+                                      var path = fbd.SelectedPath;
+
+                                      foreach (var item in Directory.GetFiles(path))
+                                      {
+                                          var save = new SaveFile(GetMaxId(true) + 1, Path.GetFileNameWithoutExtension(item), "Some description");
+                                          try
+                                          {
+                                              File.Copy(item, save.Location);
+                                          }
+                                          catch (Exception e)
+                                          {
+                                              _dialogService.ShowMessage(e.Message);
+                                          }
+                                          SaveFiles.Add(save);
+                                      }
+                                  }
+                              }
+                          }
+                      }));
+            }
+        }
+
         private int GetMaxId(bool isSavefiles)
         {
             switch (isSavefiles)
@@ -390,7 +427,7 @@ namespace ViceCitySaveFileManager.ViewModels
         {
             if (!_isSaved)
             {
-                var messageBoxResult = MessageBox.Show("There are unsaved changes encountered, do you really wish to exit?", "Confirmation", MessageBoxButton.YesNo);
+                var messageBoxResult = System.Windows.MessageBox.Show("There are unsaved changes encountered, do you really wish to exit?", "Confirmation", MessageBoxButton.YesNo);
 
                 e.Cancel = messageBoxResult != MessageBoxResult.Cancel;
             }

@@ -37,6 +37,12 @@
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
+        <Menu Height="25" Grid.Row="0" Grid.ColumnSpan="10" VerticalAlignment="Top" >
+            <MenuItem Header="File">
+                <MenuItem Header="Export save files from a directory" Margin="0 0 5 0" Command="{Binding ExportSaveFilesFromDirectory}"/>
+            </MenuItem>
+        </Menu>
+        
         <ListBox Grid.Row="4" Grid.Column="7" Grid.ColumnSpan="2" Grid.RowSpan="4" ItemsSource="{Binding ReplayFiles}" SelectedItem="{Binding SelectedReplayFile}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -48,7 +54,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <DataGrid FontSize="13" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="4" Grid.RowSpan="8" ItemsSource="{Binding SaveFiles}" SelectedItem="{Binding SelectedSaveFile}" CanUserResizeColumns="False" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single" >
+        <DataGrid FontSize="13" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="5" Grid.RowSpan="8" ItemsSource="{Binding SaveFiles}" SelectedItem="{Binding SelectedSaveFile}" CanUserResizeColumns="False" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Single" >
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Id" IsReadOnly="True" Binding="{Binding Path=Id}"></DataGridTextColumn>
                 <DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Path=Name}"></DataGridTextColumn>
