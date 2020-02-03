@@ -10,6 +10,7 @@ namespace ViceCitySaveFileManager
         private static readonly string UserFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         private const string SaveFiles = "SaveFiles";
         private const string ReplayFiles = "ReplayFiles";
+        private const string ExportFolder = "Export";
 
         private static string GetApplicationBasePath()
         {
@@ -50,6 +51,16 @@ namespace ViceCitySaveFileManager
         {
             if (!Directory.Exists(GetReplayFilesPath())) Directory.CreateDirectory(GetReplayFilesPath());
             if (!Directory.Exists(GetSaveFilesPath())) Directory.CreateDirectory(GetSaveFilesPath());
+        }
+
+        public static string GetDbFile()
+        {
+            return GetApplicationBasePath() + "vcdb.db";
+        }
+
+        public static string GetExportFolder()
+        {
+            return Path.Combine(GetApplicationBasePath() + ExportFolder);
         }
     }
 }

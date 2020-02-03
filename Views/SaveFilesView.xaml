@@ -39,7 +39,8 @@
 
         <Menu Height="25" Grid.Row="0" Grid.ColumnSpan="10" VerticalAlignment="Top" >
             <MenuItem Header="File">
-                <MenuItem Header="Export save files from a directory" Margin="0 0 5 0" Command="{Binding ExportSaveFilesFromDirectory}"/>
+                <MenuItem Header="Import save files from a directory" Margin="0 0 5 0" Command="{Binding ExportSaveFilesFromDirectory}"/>
+                <MenuItem Header="Export db" Margin="0 0 5 0" Command="{Binding ExportDb}"/>
             </MenuItem>
         </Menu>
         

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -30,6 +31,7 @@ namespace ViceCitySaveFileManager.ViewModels
         private RelayCommand _moveToSlot;
         private RelayCommand _clearAllSlots;
         private RelayCommand _exportSaveFilesFromDirectory;
+        private RelayCommand _exportDb;
         private static bool _isSaved;
         private readonly IDialogService _dialogService = new DefaultDialogService();
 
@@ -400,6 +402,47 @@ namespace ViceCitySaveFileManager.ViewModels
                               }
                           }
                       }));
+            }
+        }
+
+        public RelayCommand ExportDb
+        {
+            get {
+                return _exportDb ??
+                       (_exportDb = new RelayCommand(obj =>
+                       {
+                           if (!_dialogService.SaveFileDialog()) return;
+
+                           var destinationArchiveFileName = _dialogService.FilePath;
+                           var dbPath = GlobalConfig.GetDbFile();
+                           var saveFilesPath = GlobalConfig.GetSaveFilesPath();
+                           var replayFilesPath = GlobalConfig.GetReplayFilesPath();
+                           var exportFolder = GlobalConfig.GetExportFolder();
+
+                           if (!Directory.Exists(exportFolder)) Directory.CreateDirectory(exportFolder);
+                           if (!Directory.Exists(Path.Combine(exportFolder, "SaveFiles"))) Directory.CreateDirectory(Path.Combine(exportFolder, "SaveFiles"));
+                           if (!Directory.Exists(Path.Combine(exportFolder, "ReplayFiles"))) Directory.CreateDirectory(Path.Combine(exportFolder, "ReplayFiles"));
+
+                           foreach (var file in Directory.GetFiles(exportFolder))
+                           {
+                               File.Delete(file);
+                           }
+
+                           File.Copy(dbPath, Path.Combine(exportFolder, Path.GetFileName(dbPath)), true);
+
+                           foreach (var save in Directory.GetFiles(saveFilesPath))
+                           {
+                               File.Copy(save, Path.Combine(exportFolder, "SaveFiles", Path.GetFileName(save)));
+                           }
+
+                           foreach (var replay in Directory.GetFiles(replayFilesPath))
+                           {
+                               File.Copy(replay, Path.Combine(exportFolder, "ReplayFiles", Path.GetFileName(replay)));
+                           }
+
+                           ZipFile.CreateFromDirectory(exportFolder, destinationArchiveFileName);
+
+                       }));
             }
         }
 

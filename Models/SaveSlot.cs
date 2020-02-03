@@ -24,7 +24,7 @@ namespace ViceCitySaveFileManager.Models
             "GTAVCsf8.b"
         };
 
-        const int BYTES_TO_READ = sizeof(Int64);
+        const int BYTES_TO_READ = sizeof(long);
 
         private SaveFile _attachedSaveFile;
         private int _attachedSaveFileId;
@@ -58,10 +58,7 @@ namespace ViceCitySaveFileManager.Models
 
         public bool SaveFileEquals
         {
-            get {
-                if (AttachedSaveFile == null) return false;
-                    return FilesAreEqual(new FileInfo(FileName), new FileInfo(AttachedSaveFile.Location));
-            }
+            get => AttachedSaveFile != null && FilesAreEqual(new FileInfo(FileName), new FileInfo(AttachedSaveFile.Location));
             set
             {
                 _saveFileEquals = value;
