@@ -32,6 +32,7 @@ namespace ViceCitySaveFileManager.ViewModels
         private RelayCommand _clearAllSlots;
         private RelayCommand _exportSaveFilesFromDirectory;
         private RelayCommand _exportDb;
+        private RelayCommand _importDb;
         private static bool _isSaved;
         private readonly IDialogService _dialogService = new DefaultDialogService();
 
@@ -442,6 +443,24 @@ namespace ViceCitySaveFileManager.ViewModels
 
                            ZipFile.CreateFromDirectory(exportFolder, destinationArchiveFileName);
 
+                           _dialogService.ShowMessage("success!");
+                       }));
+            }
+        }
+
+        public RelayCommand ImportDb
+        {
+            get {
+                return _importDb ??
+                       (_importDb = new RelayCommand(obj =>
+                       {
+                         if (!_dialogService.OpenFileDialog()) return;
+
+                         ZipFile.ExtractToDirectory(_dialogService.FilePath, GlobalConfig.GetApplicationBasePath());
+
+                         SaveFiles.Clear();
+                         ReplayFiles.Clear();
+                         SaveSlots.Clear();
                        }));
             }
         }

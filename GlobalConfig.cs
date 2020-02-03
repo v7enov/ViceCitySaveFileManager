@@ -12,7 +12,7 @@ namespace ViceCitySaveFileManager
         private const string ReplayFiles = "ReplayFiles";
         private const string ExportFolder = "Export";
 
-        private static string GetApplicationBasePath()
+        public static string GetApplicationBasePath()
         {
             return AppDomain.CurrentDomain.BaseDirectory;
         }
