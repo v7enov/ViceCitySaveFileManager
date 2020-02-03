@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace ViceCitySaveFileManager
 {
     public static class GlobalConfig
     {
         private static readonly string UserFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        private static readonly string SaveFiles = "SaveFiles";
-        private static readonly string ReplayFiles = "ReplayFiles";
+        private const string SaveFiles = "SaveFiles";
+        private const string ReplayFiles = "ReplayFiles";
+
         private static string GetApplicationBasePath()
         {
             return AppDomain.CurrentDomain.BaseDirectory;
@@ -22,6 +18,7 @@ namespace ViceCitySaveFileManager
 
         public static void GrantAccess(string fullPath)
         {
+            if (!Directory.Exists(fullPath)) return;
             var dInfo = new DirectoryInfo(fullPath);
             var dSecurity = dInfo.GetAccessControl();
             dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));

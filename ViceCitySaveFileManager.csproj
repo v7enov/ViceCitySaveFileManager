@@ -83,10 +83,10 @@
     <Compile Include="Models\SaveFile.cs" />
     <Compile Include="Models\SaveSlot.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="ViewModels\DefaultDialogService.cs" />
-    <Compile Include="ViewModels\IDialogService.cs" />
-    <Compile Include="ViewModels\IFileService.cs" />
-    <Compile Include="ViewModels\RelayCommand.cs" />
+    <Compile Include="Helpers\DefaultDialogService.cs" />
+    <Compile Include="Helpers\IDialogService.cs" />
+    <Compile Include="Helpers\IFileService.cs" />
+    <Compile Include="Helpers\RelayCommand.cs" />
     <Compile Include="ViewModels\SaveFilesViewModel.cs" />
     <Compile Include="Views\SaveFilesView.xaml.cs">
       <DependentUpon>SaveFilesView.xaml</DependentUpon>

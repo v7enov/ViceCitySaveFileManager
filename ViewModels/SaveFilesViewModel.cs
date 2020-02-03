@@ -10,7 +10,6 @@ using System.Windows;
 using ViceCitySaveFileManager.Annotations;
 using ViceCitySaveFileManager.Models;
 using ViceCitySaveFileManager.Helpers;
-using System.Windows.Forms;
 
 namespace ViceCitySaveFileManager.ViewModels
 {
@@ -41,7 +40,7 @@ namespace ViceCitySaveFileManager.ViewModels
 
         public SaveFilesViewModel()
         {
-            if (System.Windows.Application.Current.MainWindow != null) System.Windows.Application.Current.MainWindow.Closing += OnWindowClosing;
+            if (Application.Current.MainWindow != null) Application.Current.MainWindow.Closing += OnWindowClosing;
             SaveFiles = new TrulyObservableCollection<SaveFile>(SQLiteDataAccess.LoadSaveFiles());
             ReplayFiles = new TrulyObservableCollection<ReplayFile>(SQLiteDataAccess.LoadReplayFiles());
             SaveSlots = new TrulyObservableCollection<SaveSlot>(SQLiteDataAccess.LoadSaveSlots());
@@ -113,7 +112,7 @@ namespace ViceCitySaveFileManager.ViewModels
                                    }
                                    catch (Exception e)
                                    {
-                                       System.Windows.MessageBox.Show(e.Message);
+                                       MessageBox.Show(e.Message);
                                        throw;
                                    }
                                    finally
@@ -140,7 +139,7 @@ namespace ViceCitySaveFileManager.ViewModels
                                }
                                catch (Exception e)
                                {
-                                   System.Windows.MessageBox.Show(e.Message);
+                                   MessageBox.Show(e.Message);
                                    throw;
                                }
                                finally
@@ -376,11 +375,11 @@ namespace ViceCitySaveFileManager.ViewModels
                       (_exportSaveFilesFromDirectory = new RelayCommand(obj =>
                       {
                           {
-                              using (var fbd = new FolderBrowserDialog())
+                              using (var fbd = new System.Windows.Forms.FolderBrowserDialog())
                               {
                                   var result = fbd.ShowDialog();
 
-                                  if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                                  if (result == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                                   {
                                       var path = fbd.SelectedPath;
 
@@ -427,13 +426,13 @@ namespace ViceCitySaveFileManager.ViewModels
         {
             if (!_isSaved)
             {
-                var messageBoxResult = System.Windows.MessageBox.Show("There are unsaved changes encountered, do you really wish to exit?", "Confirmation", MessageBoxButton.YesNo);
+                var messageBoxResult = MessageBox.Show("There are unsaved changes encountered, do you really wish to exit?", "Confirmation", MessageBoxButton.YesNo);
 
                 e.Cancel = messageBoxResult != MessageBoxResult.Cancel;
             }
         }
 
-        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private static void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             _isSaved = false;
         }
