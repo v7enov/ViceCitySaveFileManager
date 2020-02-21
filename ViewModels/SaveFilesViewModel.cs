@@ -120,7 +120,7 @@ namespace ViceCitySaveFileManager.ViewModels
                                    }
                                    finally
                                    {
-                                       UpdateState();
+                                       saveFile.UpdateState();
                                    }
                                }
                            }, (obj) => SelectedSaveFile != null && SaveFiles.Count > 0 && !SelectedSaveFile.FileExists

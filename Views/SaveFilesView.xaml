@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="GTA:VC Save files manager" Height="720" Width="1280" FontSize="12">
+        Title="GTA:VC Save files manager" Height="768" Width="1366" FontSize="12">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
